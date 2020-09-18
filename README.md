@@ -21,6 +21,12 @@ Modeing testing:
 python LSTMAD.py --testing --normal_data_name_test test_normal.npy --abnormal_data_name test_abnormal.npy --Pvalue_th 1e-3
 ```
 
+| Hyper-parameters | Description |
+| Nhidden | The number of hidden nodes in the LSTM cell |
+| Nbatches | Number of batches for training the model |
+| BatchSize | Batch size for training the model |
+| ChunkSize | Length of a chunk for training |
+
 Visualize sensor readings:
 ```shell
 python visualize.py
