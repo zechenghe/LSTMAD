@@ -22,10 +22,18 @@ python LSTMAD.py --testing --normal_data_name_test test_normal.npy --abnormal_da
 ```
 
 | Hyper-parameters | Description |
+|:-:|:-:|
 | Nhidden | The number of hidden nodes in the LSTM cell |
 | Nbatches | Number of batches for training the model |
 | BatchSize | Batch size for training the model |
 | ChunkSize | Length of a chunk for training |
+| SubseqLen | Length of randomly selected sequences for training |
+| LearningRate | Learning rate for training |
+| RED_collection_len | The number of prediction errors accumulated as a RED point |
+| RED_points | The number of points to form a RED distribution |
+| Pvalue_th | p-value threshold in KS-test to determine abnormal |
+
+
 
 Visualize sensor readings:
 ```shell
