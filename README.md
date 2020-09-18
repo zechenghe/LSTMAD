@@ -1,5 +1,7 @@
 Training and testing are sequenctial data in the form of [TimeFrame, NFeatures]
 
+#### Preprocess data
+
 Create a data directory `data/`
 ```shell
 mkdir data
@@ -11,15 +13,21 @@ python preprocess_data_ELE472.py
 ```
 It generates `.npy` files from `.csv` for training
 
+#### Train an LSTM anomaly detector
+
 Modeing training:
 ```shell
 python LSTMAD.py --training --normal_data_name_train train_normal.npy
 ```
 
+#### Evaluate the anomaly detector
+
 Modeing testing:
 ```shell
 python LSTMAD.py --testing --normal_data_name_test test_normal.npy --abnormal_data_name test_abnormal.npy --Pvalue_th 1e-3
 ```
+
+#### Train and test with different hyper-parameters
 
 | Hyper-parameters | Description |
 |:-:|:-:|
@@ -34,8 +42,7 @@ python LSTMAD.py --testing --normal_data_name_test test_normal.npy --abnormal_da
 | Pvalue_th | p-value threshold in KS-test to determine abnormal |
 
 
-
-Visualize sensor readings:
+#### Visualize sensor readings
 ```shell
 python visualize.py
 ```
