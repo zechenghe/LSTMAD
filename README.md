@@ -1,5 +1,6 @@
 Training and testing are sequenctial data in the form of [TimeFrame, NFeatures]
 
+Put the data (train_normal, test_normal, test_abnormal) under directory `data/` 
 ```shell
 python preprocess_data_ELE472.py
 ```
