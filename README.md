@@ -20,3 +20,8 @@ Modeing testing:
 ```shell
 python LSTMAD.py --testing --normal_data_name_test test_normal.npy --abnormal_data_name test_abnormal.npy --Pvalue_th 1e-3
 ```
+
+Visualize sensor readings:
+```shell
+python visualize.py
+```

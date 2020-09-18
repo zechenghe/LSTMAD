@@ -141,6 +141,7 @@ class Detector(nn.Module):
         print("Statistical test takes ", (T_KS_end-T_KS_start), "seconds")
 
         p_values = np.array(p_values)
+
         labels = p_values.copy()
         labels[p_values >= self.th] = 0
         labels[p_values < self.th] = 1
