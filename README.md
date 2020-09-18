@@ -5,15 +5,15 @@ Create a data directory `data/`
 mkdir data
 ```
 
-Put the collected sensor data (train_normal, test_normal, test_abnormal) under directory `data/` and run preprocessing:
+Put the collected sensor data in HW1 (train_normal, test_normal, test_abnormal) under directory `data/` and run preprocessing:
 ```shell
 python preprocess_data_ELE472.py
 ```
-It generates `.npy` file from `.csv` for training
+It generates `.npy` files from `.csv` for training
 
 Modeing training:
 ```shell
-python LSTMAD.py --training --normal_data_name_train test_abnormal.npy
+python LSTMAD.py --training --normal_data_name_train train_normal.npy
 ```
 
 Modeing testing:
