@@ -1,5 +1,3 @@
-Training and testing are sequenctial data in the form of [TimeFrame, NFeatures]
-
 #### Preprocess data
 
 Create a data directory `data/`
