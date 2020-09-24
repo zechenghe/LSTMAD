@@ -1,3 +1,7 @@
+### LSTM anormaly detection
+
+Implementation of LSTM + KS test anomaly detection
+
 #### Preprocess data
 
 Create a data directory `data/`
