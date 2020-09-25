@@ -16,7 +16,7 @@ for f in os.listdir(data_dir):
                 data.append([float(x) for x in line.split(',')[1:]])
             # Convert data to np array and transpose to [TimeFrame, Features]
             # Use Accelerometer, Gyroscope and Magnetometer
-            data_np = np.transpose(np.array(data))
+            data_np = np.transpose(np.array(data)[:6])
         np.save(data_dir + file_name_split[0] + '.npy', data_np)
         data_load = np.load(data_dir + file_name_split[0] + '.npy')
         print file_name_split[0], data_load.shape
