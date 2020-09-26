@@ -265,11 +265,11 @@ def eval_detector(args):
 
         # debug_ref is of size [seq_len-1, batch(=1), features]
         RE_ref, debug_ref = AnomalyDetector._get_reconstruction_error(
-            training_normal_data,
+            ref_normal_data,
             gpu=gpu)
 
         seq_dict = {
-            "truth": training_normal_data[1:,feature_idx].detach().numpy(),
+            "truth": ref_normal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_ref[:,0, feature_idx].detach().numpy(),
             }
         utils.plot_seq(seq_dict, title="Train normal prediction")
@@ -280,6 +280,7 @@ def eval_detector(args):
             "RE_abnormal": RE_abnormal
         }
         utils.plot_seq(RE_seq_dict, title="Reconstruction errors")
+        utils.plot_cdf(RE_seq_dict, title="RED cdf")
 
 
     print("p_values_normal.shape ", len(p_values_normal))
@@ -301,7 +302,7 @@ def eval_detector(args):
         utils.eval_metrics(
             truth = true_label,
             pred = pred,
-            anomaly_score = -np.log10(pred_score+1e-200)  # Anomaly score=-log(p_value)
+            anomaly_score = -np.log10(pred_score+1e-50)  # Anomaly score=-log(p_value)
             )
     )
 

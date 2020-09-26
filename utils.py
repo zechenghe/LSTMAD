@@ -1,3 +1,4 @@
+import collections
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -59,7 +60,10 @@ def eval_metrics(truth, pred, anomaly_score=None, verbose=True ):
     if anomaly_score is not None:
         fpr, tpr, thresholds = metrics.roc_curve(truth, anomaly_score)
         print truth
-        print anomaly_score
+        print thresholds
+        print fpr
+        print np.unique(anomaly_score)
+        print collections.Counter(anomaly_score)
         roc_auc = metrics.roc_auc_score(truth, anomaly_score)
         if verbose:
             print "ROC AUC: ", roc_auc

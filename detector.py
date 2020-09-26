@@ -117,11 +117,11 @@ class Detector(nn.Module):
             t += self.RED_collection_len * self.RED_points
 
 
-        self.RED = [np.random.choice(
-            np.reshape(np.array(ref_RED), (-1)),
-            size=[self.RED_points]
-            )]
-        #self.RED = ref_RED[:]
+        #self.RED = [np.random.choice(
+        #    np.reshape(np.array(ref_RED), (-1)),
+        #    size=[self.RED_points]
+        #    )]
+        self.RED = ref_RED[:]
 
 
     def predict(self, seq, gpu, debug=False):
