@@ -10,6 +10,7 @@ import time
 import math
 import os
 import numpy as np
+import utils
 
 from scipy import stats
 
@@ -63,11 +64,17 @@ class Detector(nn.Module):
         return (data - self.mean) / (self.std + self.eps)
 
 
-    def _get_RE(self, seq, gpu):
+    def _get_reconstruction_error(self, seq, gpu=False):
+        """
+            Compute reconstruction errors (RE).
+        """
 
+        # LSTM input of shape (seq_len, batch, input_size)
         seq = seq.unsqueeze(1)
-        init_state = (torch.zeros(1, 1, self.hidden_size),
-                    torch.zeros(1, 1, self.hidden_size))
+        init_state = (
+            torch.zeros(1, 1, self.hidden_size),
+            torch.zeros(1, 1, self.hidden_size)
+            )
 
         if gpu:
             seq = seq.cuda()
@@ -83,9 +90,9 @@ class Detector(nn.Module):
             pred_array = pred.detach().numpy()
             truth_array = truth.detach().numpy()
 
-        RE = np.squeeze(np.sum((pred_array - truth_array)**2, axis=2))
+        RE = np.squeeze(np.sum((pred_array - truth_array)**2, axis=-1))
 
-        return RE
+        return RE, pred
 
 
     def collect_ref_RED(self, seq, gpu):
@@ -94,7 +101,7 @@ class Detector(nn.Module):
         assert self.RED_points != None, "Set RED_points first"
         assert len(seq) >= self.RED_collection_len * self.RED_points + 1, "Ref sequence is too short"
 
-        RE = self._get_RE(seq, gpu)
+        RE, _ = self._get_reconstruction_error(seq, gpu)
 
         t = 0
         ref_RED = []
@@ -109,17 +116,22 @@ class Detector(nn.Module):
             ref_RED.append(accumulate_RED)
             t += self.RED_collection_len * self.RED_points
 
-        self.RED = ref_RED[:]
+
+        self.RED = [np.random.choice(
+            np.reshape(np.array(ref_RED), (-1)),
+            size=[self.RED_points]
+            )]
+        #self.RED = ref_RED[:]
 
 
-    def predict(self, seq, gpu):
+    def predict(self, seq, gpu, debug=False):
 
         assert self.RED_collection_len != None, "Set RED_collection_len first"
         assert self.RED_points != None, "Set RED_points first"
         assert len(seq) >= self.RED_collection_len * self.RED_points + 1, "Testing sequence is too short"
 
         T_pred_start = time.clock()
-        RE = self._get_RE(seq, gpu)
+        RE, _ = self._get_reconstruction_error(seq, gpu)
         T_pred_end = time.clock()
         print("Prediction takes ", (T_pred_end-T_pred_start), "seconds")
 
@@ -127,12 +139,24 @@ class Detector(nn.Module):
         t = 0
 
         T_KS_start = time.clock()
+
         while t + self.RED_collection_len * self.RED_points < len(RE):
             accumulate_idx = np.array(range(t, t + self.RED_collection_len * self.RED_points, self.RED_collection_len))
             accumulate_RED = np.zeros(self.RED_points)
 
             for l in range(self.RED_collection_len):
                 accumulate_RED += RE[accumulate_idx + l]
+
+            if t == 0 and debug:
+                utils.plot_cdf(
+                    {
+                        "Reference": self.RED[0],
+                        "Testing": accumulate_RED
+                    },
+                    title="p_value {p}".format(
+                        p=stats.ks_2samp(self.RED[0], accumulate_RED)[1]
+                    )
+                )
 
             p_values.append(stats.ks_2samp(self.RED[0], accumulate_RED)[1])
             t += 1
@@ -143,6 +167,8 @@ class Detector(nn.Module):
         p_values = np.array(p_values)
 
         labels = p_values.copy()
+
+        # 0 is normal, 1 is abnormal
         labels[p_values >= self.th] = 0
         labels[p_values < self.th] = 1
 
@@ -152,13 +178,3 @@ class Detector(nn.Module):
         hiddens, state = self.net(seq, state)
         pred = self.hidden2pred(hiddens)
         return pred, state
-
-    def forward_step(self, init_state, seq):
-
-        pred = []
-        state = init_state
-        for timeframe in seq:
-            out, state = self.net(timeframe, state)
-            pred.append(self.hidden2pred(out))
-
-        return torch.tensor(pred)

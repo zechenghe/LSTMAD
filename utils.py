@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import roc_curve
-from sklearn.metrics import roc_auc_score
+from sklearn import metrics
 
 def read_npy_data_single_flle(filename):
     print("Reading Data: " + filename)
@@ -28,7 +27,7 @@ def normalize(data, mean, std):
     eps = 1e-8
     return (data - mean) / (std + eps)
 
-def eval_metrics( truth, pred, pred_score=None, verbose=True ):
+def eval_metrics(truth, pred, anomaly_score=None, verbose=True ):
     eps = 1e-12
     tp = np.sum( np.multiply((pred == 1) , (truth == 1)), axis=0 , dtype=np.float32)
     fp = np.sum( np.multiply((pred == 1) , (truth == 0)), axis=0 , dtype=np.float32)
@@ -57,9 +56,11 @@ def eval_metrics( truth, pred, pred_score=None, verbose=True ):
         print '---------------------------------------------------'
 
     roc, roc_auc = None, None
-    if pred_score is not None:
-        fpr, tpr, thresholds = roc_curve(truth, pred_score)
-        roc_auc = roc_auc_score(truth, pred_score)
+    if anomaly_score is not None:
+        fpr, tpr, thresholds = metrics.roc_curve(truth, anomaly_score)
+        print truth
+        print anomaly_score
+        roc_auc = metrics.roc_auc_score(truth, anomaly_score)
         if verbose:
             print "ROC AUC: ", roc_auc
 
@@ -93,6 +94,83 @@ def seq_win_vectorize(seq, window_size):
     for i in range(len(seq)-window_size+1):
         res.append(seq[i: i+window_size,:].reshape((-1)))
     return np.array(res)
+
+def plot_seq(seqs, T=None, xlabel=None, ylabel=None, title=None):
+    """
+        Plot squences for visualization and debug.
+        Args:
+            Seqs: a dictionary of sequences (key, value). Key is squence label,
+            value is the sequence to plot.
+            T: plot partial sequence, i.e., seq[:T]. If None, plot the
+            whole sequence.
+    """
+    plt.figure()
+    for k, v in seqs.items():
+        end = T if T is not None else len(v)
+        t = np.arange(0, end, 1.0)
+
+        seq_plot, = plt.plot(t, v[:end])
+        seq_plot.set_label(k)
+
+    if xlabel is not None:
+        plt.xlabel(xlabel)
+
+    if ylabel is not None:
+        plt.xlabel(ylabel)
+
+    if title is not None:
+        plt.title(title)
+
+    plt.legend(loc="lower right")
+    plt.show(block = False)
+
+
+def plot_hist(data, xlabel=None, ylabel=None, title=None):
+    """
+        Plot histograms for visualization and debug.
+        Args:
+            data: a dictionary of sequences (key, value). Key is label,
+            value is the points to generate a historam.
+    """
+    plt.figure()
+    for k, v in data.items():
+        plt.hist(v, label=k)
+
+    if xlabel is not None:
+        plt.xlabel(xlabel)
+
+    if ylabel is not None:
+        plt.xlabel(ylabel)
+
+    if title is not None:
+        plt.title(title)
+
+    plt.legend(loc="lower right")
+    plt.show(block = False)
+
+
+def plot_cdf(data, xlabel=None, ylabel=None, title=None):
+    """
+        Plot cumulative distribution function for visualization and debug.
+        Args:
+            data: a dictionary of sequences (key, value). Key is label,
+            value is the points to generate the cdf.
+    """
+    plt.figure()
+    for k, v in data.items():
+        plt.plot(np.sort(v), np.linspace(0, 1, len(v), endpoint=False), label=k)
+
+    if xlabel is not None:
+        plt.xlabel(xlabel)
+
+    if ylabel is not None:
+        plt.xlabel(ylabel)
+
+    if title is not None:
+        plt.title(title)
+
+    plt.legend(loc="lower right")
+    plt.show(block = False)
 
 
 def create_parser():

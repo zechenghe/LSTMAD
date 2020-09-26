@@ -50,11 +50,11 @@ def train(args):
     Pvalue_th = args.Pvalue_th
 
     if args.dummydata:
-        training_normal_data, ref_normal_data, val_normal_data = (
+        training_normal_data, val_normal_data, ref_normal_data = (
             loaddata.load_normal_dummydata()
         )
     else:
-        training_normal_data, ref_normal_data, val_normal_data = (
+        training_normal_data, val_normal_data, ref_normal_data = (
             loaddata.load_data_split(
                 data_dir = normal_data_dir,
                 file_name = normal_data_name_train,
@@ -75,10 +75,11 @@ def train(args):
     AnomalyDetector.set_std(training_normal_data_std)
 
     training_normal_data = AnomalyDetector.normalize(training_normal_data)
+    val_normal_data = AnomalyDetector.normalize(val_normal_data)
     ref_normal_data = torch.tensor(AnomalyDetector.normalize(ref_normal_data))
-    val_normal_data = torch.tensor(AnomalyDetector.normalize(val_normal_data))
 
     training_normal_wrapper = SeqGenerator.SeqGenerator(training_normal_data)
+    val_normal_wrapper = SeqGenerator.SeqGenerator(val_normal_data)
     training_normal_len = len(training_normal_data)
 
     MSELossLayer = torch.nn.MSELoss()
@@ -99,44 +100,51 @@ def train(args):
             print(name, para.size())
 
     for batch in range(Nbatches):
-        t = 0
-        init_state = (torch.zeros(1, BatchSize, Nhidden),
-                    torch.zeros(1, BatchSize, Nhidden))
-        training_batch = torch.tensor(training_normal_wrapper.next(BatchSize, SubseqLen))
 
-        if gpu:
-            init_state = (init_state[0].cuda(), init_state[1].cuda())
-            training_batch = training_batch.cuda()
-
-        state = init_state
-        loss_hist = []
-        while t + ChunkSize + 1 < SubseqLen:
-
-            AnomalyDetector.zero_grad()
-
-            pred, state = AnomalyDetector.forward(training_batch[t:t+ChunkSize, :, :], state)
-            truth =  training_batch[t+1 : t+ChunkSize+1, :, :]
-
-            loss = MSELossLayer(pred, truth)
-
-            if debug:
-                print("pred.size ", pred.size(), "truth.size ", truth.size())
-
-            loss.backward()
-            optimizer.step()
+        def step_fn(data_batch, is_train=True):
+            t = 0
+            init_state = (torch.zeros(1, BatchSize, Nhidden),
+                        torch.zeros(1, BatchSize, Nhidden))
 
             if gpu:
-                loss_hist.append(loss.detach().cpu().numpy())
-            else:
-                loss_hist.append(loss.detach().numpy())
+                init_state = (init_state[0].cuda(), init_state[1].cuda())
+                training_batch = training_batch.cuda()
 
-            if debug:
-                print("t =", t, 'Training loss: ', loss)
+            state = init_state
+            loss_list = []
+            while t + ChunkSize + 1 < SubseqLen:
+                if is_train:
+                    AnomalyDetector.zero_grad()
 
-            state = (state[0].detach(), state[1].detach())
-            t += ChunkSize
+                pred, state = AnomalyDetector.forward(
+                    data_batch[t:t+ChunkSize, :, :], state)
+                truth = data_batch[t+1 : t+ChunkSize+1, :, :]
 
-        print("Batch", batch, "Training loss", np.mean(loss_hist))
+                loss = MSELossLayer(pred, truth)
+
+                if debug:
+                    print("pred.size ", pred.size(), "truth.size ", truth.size())
+
+                if is_train:
+                    loss.backward()
+                    optimizer.step()
+
+                if gpu:
+                    loss_list.append(loss.detach().cpu().numpy())
+                else:
+                    loss_list.append(loss.detach().numpy())
+
+                state = (state[0].detach(), state[1].detach())
+                t += ChunkSize
+            return loss_list
+
+        training_batch = torch.tensor(
+                    training_normal_wrapper.next(BatchSize, SubseqLen))
+        train_loss_list = step_fn(training_batch, is_train=True)
+        val_batch = torch.tensor(
+                    val_normal_wrapper.next(BatchSize, SubseqLen))
+        val_loss_list = step_fn(val_batch, is_train=False)
+        print("Batch", batch, "Training loss", np.mean(train_loss_list), "Val loss", np.mean(val_loss_list))
 
         if (batch + 1) % LRdecrease == 0:
             LearningRate = LearningRate / 2.0
@@ -145,7 +153,10 @@ def train(args):
     print("Training Done")
     print("Getting RED")
 
-    AnomalyDetector.set_RED_config(RED_collection_len = RED_collection_len, RED_points = RED_points)
+    AnomalyDetector.set_RED_config(
+        RED_collection_len=RED_collection_len,
+        RED_points=RED_points
+        )
     AnomalyDetector.collect_ref_RED(ref_normal_data, gpu)
 
     if not os.path.exists(save_model_dir):
@@ -173,14 +184,31 @@ def eval_detector(args):
     AnomalyDetector.th = Pvalue_th
 
     if args.dummydata:
-        training_normal_data, ref_normal_data, testing_normal_data = loaddata.load_normal_dummydata()
+        _, _, testing_normal_data = loaddata.load_normal_dummydata()
     else:
+        if args.debug:
+            training_normal_data, val_normal_data, ref_normal_data = (
+                loaddata.load_data_split(
+                    data_dir = normal_data_dir,
+                    file_name = args.normal_data_name_train,
+                    split = (0.8, 0.1, 0.1)
+                    )
+                )
+            training_normal_data = torch.tensor(
+                AnomalyDetector.normalize(training_normal_data))
+            val_normal_data = torch.tensor(
+                AnomalyDetector.normalize(val_normal_data))
+            ref_normal_data = torch.tensor(
+                AnomalyDetector.normalize(ref_normal_data))
+
+
         testing_normal_data = loaddata.load_data_all(
             data_dir = normal_data_dir,
             file_name = normal_data_name_test
         )
 
-    testing_normal_data = torch.tensor(AnomalyDetector.normalize(testing_normal_data))
+    testing_normal_data = torch.tensor(
+        AnomalyDetector.normalize(testing_normal_data))
 
 
     if args.dummydata:
@@ -199,17 +227,69 @@ def eval_detector(args):
         testing_normal_data = testing_normal_data.cuda()
         testing_abnormal_data = testing_abnormal_data.cuda()
 
-
     true_label_normal = np.zeros(len(testing_normal_data) - AnomalyDetector.RED_collection_len * AnomalyDetector.RED_points - 1)
     true_label_abnormal = np.ones(len(testing_abnormal_data) - AnomalyDetector.RED_collection_len * AnomalyDetector.RED_points - 1)
     true_label = np.concatenate((true_label_normal, true_label_abnormal), axis=0)
 
-    pred_normal, p_values_normal = AnomalyDetector.predict(testing_normal_data, gpu)
+    pred_normal, p_values_normal = AnomalyDetector.predict(
+        testing_normal_data,
+        gpu,
+        debug=args.debug
+        )
+
+    if args.debug:
+        feature_idx = 0
+
+        # debug_pred_normal is of size [seq_len-1, batch(=1), features]
+        RE_normal, debug_pred_normal = AnomalyDetector._get_reconstruction_error(
+            testing_normal_data,
+            gpu=gpu)
+
+        seq_dict = {
+            "truth": testing_normal_data[1:,feature_idx].detach().numpy(),
+            "pred": debug_pred_normal[:,0, feature_idx].detach().numpy(),
+        }
+        utils.plot_seq(seq_dict, title="Testing normal prediction")
+
+        # debug_pred_normal is of size [seq_len-1, batch(=1), features]
+        RE_abnormal, debug_pred_abnormal = AnomalyDetector._get_reconstruction_error(
+            testing_abnormal_data,
+            gpu=gpu
+            )
+
+        seq_dict = {
+            "truth": testing_abnormal_data[1:,feature_idx].detach().numpy(),
+            "pred": debug_pred_abnormal[:,0, feature_idx].detach().numpy(),
+        }
+        utils.plot_seq(seq_dict, title="Testing abnormal prediction")
+
+        # debug_ref is of size [seq_len-1, batch(=1), features]
+        RE_ref, debug_ref = AnomalyDetector._get_reconstruction_error(
+            training_normal_data,
+            gpu=gpu)
+
+        seq_dict = {
+            "truth": training_normal_data[1:,feature_idx].detach().numpy(),
+            "pred": debug_ref[:,0, feature_idx].detach().numpy(),
+            }
+        utils.plot_seq(seq_dict, title="Train normal prediction")
+
+        RE_seq_dict = {
+            "RE_reference": RE_ref,
+            "RE_normal": RE_normal,
+            "RE_abnormal": RE_abnormal
+        }
+        utils.plot_seq(RE_seq_dict, title="Reconstruction errors")
+
 
     print("p_values_normal.shape ", len(p_values_normal))
     print("p_values_normal.mean ", np.mean(p_values_normal))
 
-    pred_abnormal, p_values_abnormal = AnomalyDetector.predict(testing_abnormal_data, gpu)
+    pred_abnormal, p_values_abnormal = AnomalyDetector.predict(
+        testing_abnormal_data,
+        gpu,
+        debug=args.debug
+        )
     print("p_values_abnormal.shape ", len(p_values_abnormal))
     print("p_values_abnormal.mean ", np.mean(p_values_abnormal))
 
@@ -221,7 +301,7 @@ def eval_detector(args):
         utils.eval_metrics(
             truth = true_label,
             pred = pred,
-            pred_score = 1-pred_score    # Anomaly score = 1 - p_value
+            anomaly_score = -np.log10(pred_score+1e-200)  # Anomaly score=-log(p_value)
             )
     )
 
@@ -232,7 +312,7 @@ def eval_detector(args):
     plt.ylim([-0.01, 1.01])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('LSTM anomaly detector')
+    plt.title('ROC of LSTM anomaly detector')
     plt.legend(loc="lower right")
     plt.show()
 
