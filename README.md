@@ -57,7 +57,7 @@ python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000
 | BatchSize | Batch size for training the model | 16 |
 | ChunkSize | Length of a chunk for training | 500 |
 | SubseqLen | Length of randomly selected sequences for training | 5000 |
-| LearningRate | Learning rate for training | 1e-1 |
+| LearningRate | Learning rate for training | 1e-2 |
 | RED_collection_len | The number of prediction errors accumulated as a RED point | 1 |
 | RED_points | The number of points to form a RED distribution | 100 |
 | Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 |
