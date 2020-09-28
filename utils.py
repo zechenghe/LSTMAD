@@ -59,11 +59,6 @@ def eval_metrics(truth, pred, anomaly_score=None, verbose=True ):
     roc, roc_auc = None, None
     if anomaly_score is not None:
         fpr, tpr, thresholds = metrics.roc_curve(truth, anomaly_score)
-        print truth
-        print thresholds
-        print fpr
-        print np.unique(anomaly_score)
-        print collections.Counter(anomaly_score)
         roc_auc = metrics.roc_auc_score(truth, anomaly_score)
         if verbose:
             print "ROC AUC: ", roc_auc
@@ -99,7 +94,7 @@ def seq_win_vectorize(seq, window_size):
         res.append(seq[i: i+window_size,:].reshape((-1)))
     return np.array(res)
 
-def plot_seq(seqs, T=None, xlabel=None, ylabel=None, title=None):
+def plot_seq(seqs, T=None, start=0, xlabel=None, ylabel=None, title=None):
     """
         Plot squences for visualization and debug.
         Args:
@@ -111,9 +106,9 @@ def plot_seq(seqs, T=None, xlabel=None, ylabel=None, title=None):
     plt.figure()
     for k, v in seqs.items():
         end = T if T is not None else len(v)
-        t = np.arange(0, end, 1.0)
+        t = np.arange(start, end, 1.0)
 
-        seq_plot, = plt.plot(t, v[:end])
+        seq_plot, = plt.plot(t, v[start:end])
         seq_plot.set_label(k)
 
     if xlabel is not None:

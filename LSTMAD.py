@@ -54,12 +54,18 @@ def train(args):
             loaddata.load_normal_dummydata()
         )
     else:
-        training_normal_data, val_normal_data, ref_normal_data = (
+        _, training_normal_data, _, = (
             loaddata.load_data_split(
                 data_dir = normal_data_dir,
                 file_name = normal_data_name_train,
-                split = (0.8, 0.1, 0.1)
+                split = (0.1, 0.8, 0.1)
                 )
+        )
+
+        _, ref_normal_data, val_normal_data = loaddata.load_data_split(
+            data_dir = normal_data_dir,
+            file_name = 'val_and_ref.npy',
+            split = (0.1, 0.45, 0.45)
         )
 
     training_normal_data_mean = utils.get_mean(training_normal_data)
@@ -172,6 +178,7 @@ def eval_detector(args):
     load_model_dir = args.load_model_dir
     load_model_name = args.load_model_name
     normal_data_dir = args.normal_data_dir
+    normal_data_name_train = args.normal_data_name_train
     normal_data_name_test = args.normal_data_name_test
     abnormal_data_dir = args.abnormal_data_dir
     abnormal_data_name = args.abnormal_data_name
@@ -187,13 +194,20 @@ def eval_detector(args):
         _, _, testing_normal_data = loaddata.load_normal_dummydata()
     else:
         if args.debug:
-            training_normal_data, val_normal_data, ref_normal_data = (
+            _, training_normal_data, _, = (
                 loaddata.load_data_split(
                     data_dir = normal_data_dir,
-                    file_name = args.normal_data_name_train,
-                    split = (0.8, 0.1, 0.1)
+                    file_name = normal_data_name_train,
+                    split = (0.1, 0.8, 0.1)
                     )
+                    )
+
+            _, ref_normal_data, val_normal_data = loaddata.load_data_split(
+                data_dir = normal_data_dir,
+                file_name = 'val_and_ref.npy',
+                split = (0.1, 0.45, 0.45)
                 )
+
             training_normal_data = torch.tensor(
                 AnomalyDetector.normalize(training_normal_data))
             val_normal_data = torch.tensor(
@@ -249,7 +263,7 @@ def eval_detector(args):
             "truth": testing_normal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_pred_normal[:,0, feature_idx].detach().numpy(),
         }
-        utils.plot_seq(seq_dict, title="Testing normal prediction")
+        utils.plot_seq(seq_dict, start=1000, T=1500, title="Testing normal prediction")
 
         # debug_pred_normal is of size [seq_len-1, batch(=1), features]
         RE_abnormal, debug_pred_abnormal = AnomalyDetector._get_reconstruction_error(
@@ -261,7 +275,7 @@ def eval_detector(args):
             "truth": testing_abnormal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_pred_abnormal[:,0, feature_idx].detach().numpy(),
         }
-        utils.plot_seq(seq_dict, title="Testing abnormal prediction")
+        utils.plot_seq(seq_dict, start=1000, T=1500, title="Testing abnormal prediction")
 
         # debug_ref is of size [seq_len-1, batch(=1), features]
         RE_ref, debug_ref = AnomalyDetector._get_reconstruction_error(
@@ -272,7 +286,7 @@ def eval_detector(args):
             "truth": ref_normal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_ref[:,0, feature_idx].detach().numpy(),
             }
-        utils.plot_seq(seq_dict, title="Train normal prediction")
+        utils.plot_seq(seq_dict, start=1000, T=1500, title="Train normal ref prediction")
 
         RE_seq_dict = {
             "RE_reference": RE_ref,
