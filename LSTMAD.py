@@ -44,6 +44,7 @@ def train(args):
 
     normal_data_dir = args.normal_data_dir
     normal_data_name_train = args.normal_data_name_train
+    val_and_ref_name = args.normal_data_name_val_and_ref
 
     RED_collection_len = args.RED_collection_len
     RED_points = args.RED_points
@@ -54,17 +55,19 @@ def train(args):
             loaddata.load_normal_dummydata()
         )
     else:
-        _, training_normal_data, _, = (
+        _, training_normal_data, _ = (
             loaddata.load_data_split(
                 data_dir = normal_data_dir,
                 file_name = normal_data_name_train,
+                # The first few readings could be unstable, remove it.
                 split = (0.1, 0.8, 0.1)
                 )
         )
 
         _, ref_normal_data, val_normal_data = loaddata.load_data_split(
             data_dir = normal_data_dir,
-            file_name = 'val_and_ref.npy',
+            file_name = val_and_ref_name,
+            # The first few readings could be unstable, remove it.
             split = (0.1, 0.45, 0.45)
         )
 
@@ -183,6 +186,7 @@ def eval_detector(args):
     abnormal_data_dir = args.abnormal_data_dir
     abnormal_data_name = args.abnormal_data_name
     Pvalue_th = args.Pvalue_th
+    val_and_ref_name = args.normal_data_name_val_and_ref
 
     gpu = args.gpu
 
@@ -204,7 +208,7 @@ def eval_detector(args):
 
             _, ref_normal_data, val_normal_data = loaddata.load_data_split(
                 data_dir = normal_data_dir,
-                file_name = 'val_and_ref.npy',
+                file_name = val_and_ref_name,
                 split = (0.1, 0.45, 0.45)
                 )
 
@@ -223,7 +227,6 @@ def eval_detector(args):
 
     testing_normal_data = torch.tensor(
         AnomalyDetector.normalize(testing_normal_data))
-
 
     if args.dummydata:
         testing_abnormal_data = loaddata.load_abnormal_dummydata()
@@ -263,7 +266,8 @@ def eval_detector(args):
             "truth": testing_normal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_pred_normal[:,0, feature_idx].detach().numpy(),
         }
-        utils.plot_seq(seq_dict, start=1000, T=1500, title="Testing normal prediction")
+        seq_dict["diff"] = (seq_dict["pred"] - seq_dict["truth"])**2
+        utils.plot_seq(seq_dict, title="Testing normal prediction")
 
         # debug_pred_normal is of size [seq_len-1, batch(=1), features]
         RE_abnormal, debug_pred_abnormal = AnomalyDetector._get_reconstruction_error(
@@ -275,7 +279,8 @@ def eval_detector(args):
             "truth": testing_abnormal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_pred_abnormal[:,0, feature_idx].detach().numpy(),
         }
-        utils.plot_seq(seq_dict, start=1000, T=1500, title="Testing abnormal prediction")
+        seq_dict["diff"] = (seq_dict["pred"] - seq_dict["truth"])**2
+        utils.plot_seq(seq_dict, title="Testing abnormal prediction")
 
         # debug_ref is of size [seq_len-1, batch(=1), features]
         RE_ref, debug_ref = AnomalyDetector._get_reconstruction_error(
@@ -286,7 +291,8 @@ def eval_detector(args):
             "truth": ref_normal_data[1:,feature_idx].detach().numpy(),
             "pred": debug_ref[:,0, feature_idx].detach().numpy(),
             }
-        utils.plot_seq(seq_dict, start=1000, T=1500, title="Train normal ref prediction")
+        seq_dict["diff"] = (seq_dict["pred"] - seq_dict["truth"])**2
+        utils.plot_seq(seq_dict, title="Train normal ref prediction")
 
         RE_seq_dict = {
             "RE_reference": RE_ref,

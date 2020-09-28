@@ -1,4 +1,5 @@
-data/*
-checkpoints/*
+data/pin/*
+data/walk/*
+data/walk-correct/*
 *.pyc
 .DS_Store

@@ -191,8 +191,8 @@ def create_parser():
     # Training parameters
     parser.add_argument('--Nbatches', type = int, default = 100, help='Number of batches in training')
     parser.add_argument('--BatchSize', type = int, default = 16, help='Size of a batch in training')
-    parser.add_argument('--ChunkSize', type = int, default = 50, help='The length of a chunk in training')
-    parser.add_argument('--SubseqLen', type = int, default = 500, help='The length of the randomly selected sequence for training')
+    parser.add_argument('--ChunkSize', type = int, default = 500, help='The length of a chunk in training')
+    parser.add_argument('--SubseqLen', type = int, default = 5000, help='The length of the randomly selected sequence for training')
     parser.add_argument('--LearningRate', type = float, default = 1e-2, help='The initial learning rate of the Adam optimizer')
     parser.add_argument('--AMSGrad', type = bool, default = True, help='Whether the AMSGrad variant is used')
     parser.add_argument('--Eps', type = float, default = 1e-3, help='The term added to the denominator to improve numerical stability')
@@ -200,18 +200,19 @@ def create_parser():
 
     # Statistic test config
     parser.add_argument('--RED_collection_len', type = int, default = 1, help='The number of readings whose prediction errors are added as a data point')
-    parser.add_argument('--RED_points', type = int, default = 10, help='The number of data points that are collected at a time on the testing data to form a testing RED')
-    parser.add_argument('--Pvalue_th', type = float, default = 0.001, help='The threshold of p-value in KS test')
+    parser.add_argument('--RED_points', type = int, default = 100, help='The number of data points that are collected at a time on the testing data to form a testing RED')
+    parser.add_argument('--Pvalue_th', type = float, default = 0.05, help='The threshold of p-value in KS test')
 
     # Loaddata
     # Sequential data in the form of (Timeframe, Features)
     # Training only leverages normal data. Abnormaly data only for testing.
     parser.add_argument('--normal_data_dir', type = str, default = "data/", help='The directory of normal data')
-    parser.add_argument('--normal_data_name_train', type = str, default = "baseline_train.npy", help='The file name of training normal data')
-    parser.add_argument('--normal_data_name_test', type = str, default = "baseline_test.npy", help='The file name of testing normal data')
+    parser.add_argument('--normal_data_name_train', type = str, default = "train_normal.npy", help='The file name of training normal data')
+    parser.add_argument('--normal_data_name_test', type = str, default = "test_normal.npy", help='The file name of testing normal data')
+    parser.add_argument('--normal_data_name_val_and_ref', type = str, default = "val_and_ref.npy", help='The file name of testing normal data')
 
     parser.add_argument('--abnormal_data_dir', type = str, default = "data/", help='The directory of abnormal data')
-    parser.add_argument('--abnormal_data_name', type = str, default = "attack1_test.npy", help='The file name of abnormal data')
+    parser.add_argument('--abnormal_data_name', type = str, default = "test_abnormal.npy", help='The file name of abnormal data')
 
     # Save and load model. Save after training. Load before testing.
     parser.add_argument('--save_model_dir', type = str, default = "checkpoints/", help='The directory to save the model')

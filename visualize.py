@@ -12,7 +12,7 @@ test_normal_datasource = 'data/test_normal.npy'
 test_abnormal_datasource = 'data/test_abnormal.npy'
 
 # sensor_idx selects sensor
-sensor_idx = 1
+sensor_idx = 0
 start = 2000
 end = 2500
 utils.plot_seq(
