@@ -174,6 +174,7 @@ def train(args):
         AnomalyDetector,
         save_model_dir + save_model_name
         )
+    AnomalyDetector.jitSaveTorchModule(save_model_dir)
     print("Model saved")
 
 def eval_detector(args):

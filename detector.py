@@ -29,7 +29,7 @@ class Detector(nn.Module):
         self.eps = 1e-8
 
         # Single-layer LSTM, can change to other models
-        self.net = torch.nn.LSTM(
+        self.net = nn.LSTM(
             input_size = self.Nfeatures,
             hidden_size = self.hidden_size,
             num_layers = self.num_layers
@@ -178,3 +178,9 @@ class Detector(nn.Module):
         hiddens, state = self.net(seq, state)
         pred = self.hidden2pred(hiddens)
         return pred, state
+
+    def jitSaveTorchModule(self, saveDir):
+        scripted_net = torch.jit.script(self.net)
+        scripted_hidden2pred = torch.jit.script(self.hidden2pred)
+        torch.jit.save(scripted_net, saveDir+"DetectorLSTM.pt")
+        torch.jit.save(scripted_hidden2pred, saveDir+"DetectorHidden2Pred.pt")

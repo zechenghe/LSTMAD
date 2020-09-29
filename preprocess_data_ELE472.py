@@ -26,4 +26,4 @@ for f in os.listdir(data_dir):
             data_np = np.stack([acc_norm, acc_norm], axis=-1)
         np.save(data_dir + file_name_split[0] + '.npy', data_np)
         data_load = np.load(data_dir + file_name_split[0] + '.npy')
-        print file_name_split[0], data_load.shape
+        print(file_name_split[0], data_load.shape)
