@@ -14,12 +14,6 @@ def write_npy_data_single_file(filename, data):
     np.save(filename, data)
     return
 
-def get_mean(data):
-    return np.mean(data, axis = 0, keepdims = True)
-
-def get_std(data):
-    return np.std(data, axis = 0, keepdims = True)
-
 def normalize(data, mean, std):
 
     assert data.shape[1] == mean.shape[1], "Feature size should match mean size"
@@ -65,13 +59,6 @@ def eval_metrics(truth, pred, anomaly_score=None, verbose=True ):
 
     return tp, fp, fn, tn, acc, prec, rec, f1, fpr, tpr, thresholds, roc_auc
 
-
-def setLearningRate(optimizer, lr):
-    """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-
-
 def plotsignal(sigs):
 
     T = len(sigs[0])
@@ -87,12 +74,6 @@ def plotsignal(sigs):
     plt.ylim(-2, 2)
     plt.show()
 
-def seq_win_vectorize(seq, window_size):
-
-    res = []
-    for i in range(len(seq)-window_size+1):
-        res.append(seq[i: i+window_size,:].reshape((-1)))
-    return np.array(res)
 
 def plot_seq(seqs, T=None, start=0, xlabel=None, ylabel=None, title=None):
     """

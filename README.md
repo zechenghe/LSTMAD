@@ -1,37 +1,12 @@
-### LSTM anormaly detection
+### LSTM anormaly detection inference
 
-Implementation of LSTM + KS test anomaly detection
-
-#### Preprocess data
-
-Create a data directory `data/`
-```shell
-mkdir data
-```
-
-Put the collected sensor data in HW1 (train_normal, val_and_ref, test_normal, test_abnormal) under directory `data/`. Better to rename the corresponding data to `train_normal.csv`, `val_and_ref.csv`, `test_normal.csv`, `test_abnormal.csv` to match the default file names in the training and evaluation scripts.
-
-Run preprocess script:
-```shell
-python preprocess_data_ELE472.py
-```
-It generates `.npy` files from `.csv` for training. It uses accelerometer and gyroscope magnitude. Feel free to add more sensors.
-
-#### Visualize sensor readings
-```shell
-python visualize.py
-```
-
-#### Train an LSTM anomaly detector
-
-Modeing training (with default parameters):
-```shell
-python LSTMAD.py --training
-```
+This repo implements LSTM + KS test anomaly detection **inference**. For training, checkout to **master branch**.
 
 #### Evaluate the anomaly detector
 
-Modeing evaluation:
+The trained model is in `checkpoint/`. Data are stored in `data/`.
+
+To run model evaluation:
 ```shell
 python LSTMAD.py --testing --Pvalue_th 5e-2
 ```
@@ -42,9 +17,16 @@ First, tune training parameters to make sure the ROC-AUC > 0.5 before you change
 
 Each threshold `Pvalue_th` corresponding to a point on the ROC curve. Change `Pvalue_th` to move on the ROC curve.
 
+#### Visualize sensor readings
+
+Give some sense for debugging and feature selection.
+```shell
+python visualize.py
+```
+
 #### Train and test with different hyper-parameters
 
-For example, train with Nhidden=32, BatchSize=32 and ChunkSize=1000:
+Checkout to **master branch**. For example, train with Nhidden=32, BatchSize=32 and ChunkSize=1000:
 
 ```shell
 python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000

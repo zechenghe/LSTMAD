@@ -1,5 +1,6 @@
 data/pin/*
 data/walk/*
 data/walk-correct/*
+data/*.csv
 *.pyc
 .DS_Store
