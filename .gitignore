@@ -2,5 +2,6 @@ data/pin/
 data/walk/
 data/walk-correct/
 Sensor_Data/
+checkpoints/
 *.pyc
 .DS_Store
