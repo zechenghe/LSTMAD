@@ -1,5 +1,6 @@
-data/pin/*
-data/walk/*
-data/walk-correct/*
+data/pin/
+data/walk/
+data/walk-correct/
+Sensor_Data/
 *.pyc
 .DS_Store
