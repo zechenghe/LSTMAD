@@ -171,7 +171,7 @@ def train(args):
     if not os.path.exists(save_model_dir):
         os.makedirs(save_model_dir)
     torch.save(
-        AnomalyDetector,
+        AnomalyDetector.cpu(),
         save_model_dir + save_model_name
         )
     AnomalyDetector.jitSaveTorchModule(save_model_dir)
