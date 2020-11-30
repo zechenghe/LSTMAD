@@ -323,7 +323,7 @@ def eval_detector(args):
         utils.eval_metrics(
             truth = true_label,
             pred = pred,
-            anomaly_score = -np.log10(pred_score+1e-50)  # Anomaly score=-log(p_value)
+            anomaly_score = -np.log10(pred_score+1e-500)  # Anomaly score=-log(p_value)
             )
     )
 
