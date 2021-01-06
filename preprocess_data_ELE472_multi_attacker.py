@@ -1,8 +1,7 @@
 """
     Create multi-attacker data for testing.
 """
-
-
+s
 import numpy as np
 import os
 
@@ -39,7 +38,7 @@ def read_csv(f, delimiter=',', feature_idx=None):
 
 data_dir = 'Sensor_Data/task1/'
 data_save_dir = 'data/'
-user_id = '536'
+user_id = '134'
 feature_idx = [0,1,2,3,4,5]
 
 data = {}
