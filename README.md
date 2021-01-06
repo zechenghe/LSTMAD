@@ -59,5 +59,5 @@ python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000
 | SubseqLen | Length of randomly selected sequences for training | 5000 | 50, 100, 200, 500, 1000, 2000, 5000 |
 | LearningRate | Learning rate for training | 1e-2 | 1e-1, 1e-2, 1e-3, 1e-4 |
 | RED_collection_len | The number of prediction errors accumulated as a RED point | 1 | 1, 10, 20, 50 |
-| RED_points | The number of points to form a RED distribution | 100 | 20, 50, 100, 200, 500, 1000 |
+| RED_points | The number of points to form a RED distribution | 100 | 10, 20, 50, 100, 200, 500, 1000 |
 | Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 | Tune only after you have already got a good ROC. Find threshold at EER is automatic. |
