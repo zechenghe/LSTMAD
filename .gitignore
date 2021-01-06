@@ -3,3 +3,4 @@ data/walk/*
 data/walk-correct/*
 *.pyc
 .DS_Store
+Sensor_Data/

@@ -50,14 +50,14 @@ For example, train with Nhidden=32, BatchSize=32 and ChunkSize=1000:
 python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000
 ```
 
-| Hyper-parameters | Description | Default Value |
-|:-:|:-:|:-:|
-| Nhidden | The number of hidden nodes in the LSTM cell | 64 |
-| Nbatches | Number of batches for training the model | 100 |
-| BatchSize | Batch size for training the model | 16 |
-| ChunkSize | Length of a chunk for training | 500 |
-| SubseqLen | Length of randomly selected sequences for training | 5000 |
-| LearningRate | Learning rate for training | 1e-2 |
-| RED_collection_len | The number of prediction errors accumulated as a RED point | 1 |
-| RED_points | The number of points to form a RED distribution | 100 |
-| Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 |
+| Hyper-parameters | Description | Default Value | Recommended Tuning Range
+|:-:|:-:|:-:|:-:|
+| Nhidden | The number of hidden nodes in the LSTM cell | 64 | 16, 32, 64, ..., 1024 |
+| Nbatches | Number of batches for training the model | 100 | 50, 100, 200, 500, 1000 |
+| BatchSize | Batch size for training the model | 16 | 4, 8, 16, 32, 64, 128 |
+| ChunkSize | Length of a chunk for training | 500 | 100, 200, 500, 1000, 2000, 5000 |
+| SubseqLen | Length of randomly selected sequences for training | 5000 | 50, 100, 200, 500, 1000, 2000, 5000 |
+| LearningRate | Learning rate for training | 1e-2 | 1e-1, 1e-2, 1e-3, 1e-4 |
+| RED_collection_len | The number of prediction errors accumulated as a RED point | 1 | 1, 10, 20, 50 |
+| RED_points | The number of points to form a RED distribution | 100 | 20, 50, 100, 200, 500, 1000 |
+| Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 | Tune only after a good ROC. Find threshold at EER is automatic. |
