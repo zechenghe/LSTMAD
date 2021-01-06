@@ -5,3 +5,4 @@ Sensor_Data/
 checkpoints/
 *.pyc
 .DS_Store
+__pycache__/
