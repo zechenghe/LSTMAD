@@ -1,7 +1,7 @@
 """
     Create multi-attacker data for testing.
 """
-s
+
 import numpy as np
 import os
 
@@ -54,8 +54,9 @@ with open(os.path.join(data_dir, 'test', '{id}_test.csv'.format(id=user_id)), 'r
 data_attack = []
 test_dir = os.path.join(data_dir, 'test')
 n_attackers = len(list(os.listdir(test_dir)))-1
-n_samples_per_attacker = len(data['test_normal']) / n_attackers
+n_samples_per_attacker = len(data['test_normal']) // n_attackers
 print("n_attackers: ", n_attackers)
+print("n_samples_per_attacker: ", n_samples_per_attacker)
 
 for f in os.listdir(test_dir):
     if not f.startswith(user_id):
@@ -63,7 +64,7 @@ for f in os.listdir(test_dir):
         with open(os.path.join(test_dir, f), 'r') as file_handler:
             data_per_attacker = read_csv(file_handler, feature_idx=feature_idx)
             l = len(data_per_attacker)
-            data_per_attacker = data_per_attacker[l/2: l/2+n_samples_per_attacker, :]
+            data_per_attacker = data_per_attacker[l//2: l//2+n_samples_per_attacker, :]
             print(data_per_attacker.shape)
             data_attack.append(data_per_attacker)
 data['test_abnormal'] = np.concatenate(data_attack, axis=0)
