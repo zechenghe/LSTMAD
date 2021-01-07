@@ -1,5 +1,6 @@
 """
     Convert PC model to smartphone model.
+    Put the generated checkpoints/model.pt and data/ref_RED.csv under ContInf/app/src/main/assets.
 """
 
 import torch
