@@ -71,4 +71,4 @@ python convert_model.py
 This script generates `checkpoints/model.pt` and `data/ref_RED.csv`.
 Put `model.pt` and `ref_RED.csv` under `ContInf/app/src/main/assets` in the Android folder.
 
-Link to [Android starter code](https://drive.google.com/drive/folders/1OBA5Q7Jr2iiXbOrp5YNr6rHkiscnGdGq?usp=sharing).
+Link to [ELE472 Android starter code](https://drive.google.com/drive/folders/1OBA5Q7Jr2iiXbOrp5YNr6rHkiscnGdGq?usp=sharing).
