@@ -117,11 +117,11 @@ def train(args):
 
             if gpu:
                 init_state = (init_state[0].cuda(), init_state[1].cuda())
-                training_batch = training_batch.cuda()
+                data_batch = data_batch.cuda()
 
             state = init_state
             loss_list = []
-            while t + ChunkSize + 1 < SubseqLen:
+            while t + ChunkSize + 1 < data_batch.shape[0]:
                 if is_train:
                     AnomalyDetector.zero_grad()
 
@@ -151,7 +151,7 @@ def train(args):
                     training_normal_wrapper.next(BatchSize, SubseqLen))
         train_loss_list = step_fn(training_batch, is_train=True)
         val_batch = torch.tensor(
-                    val_normal_wrapper.next(BatchSize, SubseqLen))
+                    val_normal_wrapper.next(BatchSize, 2000))
         val_loss_list = step_fn(val_batch, is_train=False)
         print("Batch", batch, "Training loss", np.mean(train_loss_list), "Val loss", np.mean(val_loss_list))
 
@@ -171,7 +171,7 @@ def train(args):
     if not os.path.exists(save_model_dir):
         os.makedirs(save_model_dir)
     torch.save(
-        AnomalyDetector,
+        AnomalyDetector.cpu(),
         save_model_dir + save_model_name
         )
     AnomalyDetector.jitSaveTorchModule(save_model_dir)
@@ -323,7 +323,7 @@ def eval_detector(args):
         utils.eval_metrics(
             truth = true_label,
             pred = pred,
-            anomaly_score = -np.log10(pred_score+1e-50)  # Anomaly score=-log(p_value)
+            anomaly_score = -np.log10(pred_score+1e-500)  # Anomaly score=-log(p_value)
             )
     )
 

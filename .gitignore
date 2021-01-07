@@ -1,6 +1,14 @@
-data/pin/*
-data/walk/*
-data/walk-correct/*
+data/pin/
+data/walk/
+data/*.npy
+data/walk-correct/
+data/ref_RED.csv
+Sensor_Data/
+checkpoints/
 *.pyc
 .DS_Store
+<<<<<<< HEAD
 Sensor_Data/
+=======
+__pycache__/
+>>>>>>> dev

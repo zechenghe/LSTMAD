@@ -13,8 +13,8 @@ test_abnormal_datasource = 'data/test_abnormal.npy'
 
 # sensor_idx selects sensor
 sensor_idx = 0
-start = 2000
-end = 2500
+start = 0
+end = 8000
 utils.plot_seq(
     seqs={
         "train_normal": np.load(train_normal_datasource)[:, sensor_idx],

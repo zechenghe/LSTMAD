@@ -1,5 +1,9 @@
 """
     Create multi-attacker data for testing.
+<<<<<<< HEAD
+=======
+    Put all users' data under Sensor_Data/. The processed data are generated under data/.
+>>>>>>> dev
 """
 
 import numpy as np

@@ -23,9 +23,9 @@ def load_data_split(split = (0.4, 0.2, 0.4), data_dir = "data/", file_name = 'ba
     ref_normal = data[training_length: training_length + ref_length, :]
     testing_normal = data[training_length + ref_length :, :]
 
-    print("Normal data training shape: ", training_normal.shape)
-    print("Normal data reference shape: ", ref_normal.shape)
-    print("Normal data testing shape: ", testing_normal.shape)
+    print("Data split 0", training_normal.shape)
+    print("Data split 1", ref_normal.shape)
+    print("Data split 2", testing_normal.shape)
 
     return np.float32(training_normal), np.float32(ref_normal), np.float32(testing_normal)
 
