@@ -36,6 +36,8 @@ input_data_name = 'data/test_normal.npy'
 provided_model = torch.load(provided_checkpoint_name)
 provided_model.eval()
 
+np.savetxt("data/ref_RED.csv", provided_model.RED, delimiter=",")
+
 data = np.load(input_data_name)
 data = provided_model.normalize(data)
 data = torch.tensor(data)
@@ -50,7 +52,7 @@ print(output_provided_net)
 traced_module = torch.jit.trace(net, data)
 traced_module.save(converted_model_name)
 
-# Check output of provided and converted are same
+# Check outputs of provided and converted are same
 loaded_model = torch.jit.load(converted_model_name)
 diff_data_name = 'data/test_normal.npy'
 diff_data = np.load(diff_data_name)
