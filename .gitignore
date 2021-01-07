@@ -1,5 +1,6 @@
 data/pin/
 data/walk/
+data/*.npy
 data/walk-correct/
 Sensor_Data/
 checkpoints/

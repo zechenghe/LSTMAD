@@ -1,5 +1,5 @@
 '''
-Covert csv data to npy arrays of shape [TimeFrame, Features]
+    Covert csv data to npy arrays of shape [TimeFrame, Features]
 '''
 
 import numpy as np
