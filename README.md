@@ -61,3 +61,12 @@ python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000
 | RED_collection_len | The number of prediction errors accumulated as a RED point | 1 | 1, 10, 20, 50 |
 | RED_points | The number of points to form a RED distribution | 100 | 10, 20, 50, 100, 200, 500, 1000 |
 | Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 | Tune only after you have already got a good ROC. Find threshold at EER is automatic. |
+
+#### Convert the trained model on PC to smartphone models
+
+```shell
+python convert_model.py
+```
+
+This script generates `checkpoints/model.pt` and `data/ref_RED.csv`.
+Put `model.pt` and `ref_RED.csv` under `ContInf/app/src/main/assets` in the Android folder.
