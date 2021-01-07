@@ -7,8 +7,4 @@ Sensor_Data/
 checkpoints/
 *.pyc
 .DS_Store
-<<<<<<< HEAD
-Sensor_Data/
-=======
 __pycache__/
->>>>>>> dev
