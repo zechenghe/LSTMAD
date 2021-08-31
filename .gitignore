@@ -1,6 +1,5 @@
 data/pin/
 data/walk/
-data/*.npy
 data/walk-correct/
 data/ref_RED.csv
 Sensor_Data/
