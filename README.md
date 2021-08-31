@@ -51,8 +51,14 @@ python LSTMAD.py --training --Nhidden 32 --BatchSize 32 --ChunkSize 1000
 | RED_points | The number of points to form a RED distribution | 100 | 10, 20, 50, 100, 200, 500, 1000 |
 | Pvalue_th | p-value threshold in KS-test to determine abnormal | 0.05 | Tune only after you have already got a good ROC. Find threshold at EER is automatic. |
 
-#### Convert the trained model on PC to smartphone models
+#### Reference
+You are encouraged to cite the following paper.
 
-```shell
-python convert_model.py
+```
+@inproceedings{he2019power,
+  title={Power-grid controller anomaly detection with enhanced temporal deep learning},
+  author={He, Zecheng and Raghavan, Aswin and Hu, Guangyuan and Chai, Sek and Lee, Ruby},
+  booktitle={IEEE International Conference On Trust, Security And Privacy In Computing And Communications (TrustCom)},
+  year={2019}
+}
 ```
